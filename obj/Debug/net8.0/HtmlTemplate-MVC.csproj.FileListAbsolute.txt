@@ -28,3 +28,4 @@
 /Users/emrahelis/HtmlTemplate-MVC/obj/Debug/net8.0/HtmlTemplate-MVC.pdb
 /Users/emrahelis/HtmlTemplate-MVC/obj/Debug/net8.0/HtmlTemplate-MVC.genruntimeconfig.cache
 /Users/emrahelis/HtmlTemplate-MVC/obj/Debug/net8.0/ref/HtmlTemplate-MVC.dll
+/Users/emrahelis/HtmlTemplate-MVC/obj/Debug/net8.0/HtmlTemplate-MVC.sourcelink.json
