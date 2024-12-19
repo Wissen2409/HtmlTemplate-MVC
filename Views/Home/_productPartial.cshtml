@@ -24,7 +24,8 @@
                         </div>
                         <div class="text-center py-4">
                             @{
-
+                                // html içerisinde, bu şekilde bir parantez yaparsanız, direk c# kodu yazabilirsiniz
+                                // yazdığımız c# kodu içerisindeki değişkeni,  html içerisindeki bir href adımında kullandık!!
                                 string hrefString = "/Home/ProductDetail?productid="+@item.Id;
                             }
                             <a  class="h6 text-decoration-none text-truncate" href=@hrefString>@item.Name</a>
