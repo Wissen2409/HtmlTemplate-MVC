@@ -6,18 +6,49 @@ namespace HtmlTemplate_MVC.Controllers;
 
 public class HomeController : Controller
 {
-    private readonly ILogger<HomeController> _logger;
 
-    public HomeController(ILogger<HomeController> logger)
+    private IProductService _productService;
+    public HomeController(IProductService productService)
     {
-        _logger = logger;
+        _productService = productService;
     }
 
     public IActionResult Index()
     {
-        return View();
-    }
 
+        // View modeli initalize edelim 
+
+        IndexViewModel model = new IndexViewModel();
+
+
+        model.Products = _productService.GetFeatureProduct(120).Select(s => new ProductViewModel
+        {
+
+            Color = s.Color,
+            Id = s.Id,
+            ListPrice = s.ListPrice,
+            Name = s.ProductName,
+            StandardCost = s.StandardCost
+        }).ToList();
+
+
+        return View(model);
+    }
+    public IActionResult ProductDetail(int productId)
+    {
+
+        var returnData = _productService.ProductDetail(productId);
+
+        return View(new ProductViewModel
+        {
+            Color = returnData.Color,
+            Description = returnData.Description,
+            Id = returnData.Id,
+            ListPrice = returnData.ListPrice,
+            Name = returnData.ProductName,
+            StandardCost = returnData.StandardCost
+        });
+    }
     public IActionResult Privacy()
     {
         return View();

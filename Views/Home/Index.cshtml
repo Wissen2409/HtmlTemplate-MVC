@@ -1,4 +1,8 @@
-﻿<div class="container-fluid mb-3">
+﻿@model IndexViewModel
+
+
+
+<div class="container-fluid mb-3">
     @Html.Partial("_carouselPartial")
 </div>
 <!-- Carousel End -->
@@ -9,13 +13,13 @@
 
 @Html.Partial("_categoriesPartial")
 
-@Html.Partial("_productPartial","Feature Product")
+@Html.Partial("_productPartial",Model.Products)
 
 
 @Html.Partial("_offerPartial")
 
 
-@Html.Partial("_productPartial","Recent Product")
+@Html.Partial("_productPartial",Model.Products)
 
 
 @Html.Partial("_vectorPartial")
