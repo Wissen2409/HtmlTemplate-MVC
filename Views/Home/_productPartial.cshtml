@@ -8,7 +8,7 @@
 
         @foreach (var item in Model)
         {
-            <a href="/Home/ProductDetail?productid="@item.Id>
+            <a href="/Home/ProductDetail?productid=" @item.ProductId>
 
 
                 <div class="col-lg-3 col-md-4 col-sm-6 pb-1">
@@ -23,12 +23,13 @@
                             </div>
                         </div>
                         <div class="text-center py-4">
-                            @{
+                            @* @{
                                 // html içerisinde, bu şekilde bir parantez yaparsanız, direk c# kodu yazabilirsiniz
-                                // yazdığımız c# kodu içerisindeki değişkeni,  html içerisindeki bir href adımında kullandık!!
-                                string hrefString = "/Home/ProductDetail?productid="+@item.Id;
-                            }
-                            <a  class="h6 text-decoration-none text-truncate" href=@hrefString>@item.Name</a>
+                                // yazdığımız c# kodu içerisindeki değişkeni, html içerisindeki bir href adımında kullandık!!
+                                string hrefString = "/Home/ProductDetail?productid=" + @item.ProductId;
+                            } *@
+                            <a class="h6 text-decoration-none text-truncate"
+                                href="/Home/ProductDetail?productid=@item.ProductId">@item.Name</a> @*Boyle daha temiz oldu sanki?*@
                             <div class="d-flex align-items-center justify-content-center mt-2">
                                 <h5>$@item.StandardCost</h5>
                                 <h6 class="text-muted ml-2"><del>$@item.ListPrice</del></h6>

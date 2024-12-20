@@ -1,15 +1,17 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using HtmlTemplate_MVC.Models;
+using AutoMapper;
 
 namespace HtmlTemplate_MVC.Controllers;
 
 public class HomeController : Controller
 {
-
+    private IMapper _mapper;
     private IProductService _productService;
-    public HomeController(IProductService productService)
+    public HomeController(IProductService productService, IMapper mapper)
     {
+        _mapper = mapper;
         _productService = productService;
     }
 
@@ -17,37 +19,33 @@ public class HomeController : Controller
     {
 
         // View modeli initalize edelim 
-
         IndexViewModel model = new IndexViewModel();
 
-
-        model.Products = _productService.GetFeatureProduct(120).Select(s => new ProductViewModel
-        {
-
-            Color = s.Color,
-            Id = s.Id,
-            ListPrice = s.ListPrice,
-            Name = s.ProductName,
-            StandardCost = s.StandardCost
-        }).ToList();
+        var dtoFeaturedList = _productService.GetFeatureProduct(12); // servisten yanit DTO olarak geldi.
+        var featuredProducts = _mapper.Map<List<ProductViewModel>>(dtoFeaturedList); // DTO listesini VM listesine donusturur.
+        model.Products = featuredProducts; // modelin icine listeyi koy
 
 
         return View(model);
     }
+
+
     public IActionResult ProductDetail(int productId)
     {
 
-        var returnData = _productService.ProductDetail(productId);
+        return View(_mapper.Map<ProductViewModel>(_productService.ProductDetail(productId))); // servisten aldigin DTO yaniti automapper ile VM'e cevirip View'a model olarak yolla
 
-        return View(new ProductViewModel
-        {
-            Color = returnData.Color,
-            Description = returnData.Description,
-            Id = returnData.Id,
-            ListPrice = returnData.ListPrice,
-            Name = returnData.ProductName,
-            StandardCost = returnData.StandardCost
-        });
+        // var returnData = _productService.ProductDetail(productId);
+
+        // return View(new ProductViewModel
+        // {
+        //     Color = returnData.Color,
+        //     Description = returnData.Description,
+        //     Id = returnData.Id,
+        //     ListPrice = returnData.ListPrice,
+        //     Name = returnData.ProductName,
+        //     StandardCost = returnData.StandardCost
+        // });
     }
     public IActionResult Privacy()
     {

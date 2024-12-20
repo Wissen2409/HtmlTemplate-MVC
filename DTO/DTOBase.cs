@@ -1,5 +1,4 @@
 public class DTOBase
 {
-
-    public int Id { get; set; }
+    public int ProductId { get; set; }
 }
