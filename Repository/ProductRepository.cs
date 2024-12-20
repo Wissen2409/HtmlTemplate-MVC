@@ -8,6 +8,8 @@ public interface IProductRepository
 {
     public List<ProductDTO> GetFeatureProduct(int productCount);
     public ProductDTO ProductDetail(int productid);
+    public List<CategoryDTO> GetAllCategories();
+    public List<SubCategoryDTO> GetSubCategoriesByCategoryId(int categoryId);
 }
 public class ProductRepository : IProductRepository
 {
@@ -45,8 +47,6 @@ public class ProductRepository : IProductRepository
 
         return dtoItem;
     }
-
-
     public List<ProductDTO> GetFeatureProduct(int productCount)
     {
 
@@ -56,7 +56,7 @@ public class ProductRepository : IProductRepository
 
         // Skip ile belirli sayıdaki product'ın listelemeden geçilmesini sağlar!!
         var products = _context.Products
-            .Skip(100)
+            .Skip(210)
             .Take(productCount)
             .Select(s => new Product
             {
@@ -72,6 +72,24 @@ public class ProductRepository : IProductRepository
 
         return _mapper.Map<List<ProductDTO>>(products); // DTO'ya mapleyip donduk.
     }
+    public List<CategoryDTO> GetAllCategories()
+    {
+        List<ProductCategory> categoriesDMO = _context.ProductCategories.ToList();
+        List<CategoryDTO> categoryDTO = _mapper.Map<List<CategoryDTO>>(categoriesDMO);
+        return categoryDTO;
+    }
 
+    public List<SubCategoryDTO> GetSubCategoriesByCategoryId(int categoryId)
+    {
+        List<SubCategoryDTO> subCategories = _context.ProductSubcategories
+        .Where(x => x.ProductCategoryId == categoryId)
+        .Select(y => new SubCategoryDTO
+        {
+            ProductSubCategoryId = y.ProductSubcategoryId,
+            ProductCategoryId = y.ProductCategoryId,
+            Name = y.Name
+        }).ToList();
 
+        return subCategories;
+    }
 }

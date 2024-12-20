@@ -10,5 +10,16 @@ public class MappingProfile : Profile
             .ReverseMap();
 
         CreateMap<ProductDTO, ProductViewModel>().ReverseMap();
+
+        // Category siniflari icin mapleme
+        CreateMap<ProductCategory, CategoryDTO>().ReverseMap();
+        CreateMap<CategoryDTO, CategoryVM>().ReverseMap();
+
+        // SubCategory siniflari icin mapleme
+        CreateMap<ProductSubcategory, SubCategoryDTO>().ReverseMap();
+        CreateMap<SubCategoryDTO, SubCategoryVM>().ReverseMap();
+
+        // Filter sinifi icin mapleme
+        CreateMap<FilterDTO, FilterVM>().ReverseMap();
     }
 }
