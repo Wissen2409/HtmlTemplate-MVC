@@ -21,5 +21,7 @@ public class MappingProfile : Profile
 
         // Filter sinifi icin mapleme
         CreateMap<FilterDTO, FilterVM>().ReverseMap();
+
+        
     }
 }

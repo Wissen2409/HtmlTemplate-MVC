@@ -13,6 +13,9 @@ builder.Services.AddDbContext<AdventureWorksContext>(option =>
 builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
+builder.Services.AddScoped<IProductCategoryRepository, ProductCategoryRepository>();
+builder.Services.AddScoped<IProductCategoryService, ProductCategoryService>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
