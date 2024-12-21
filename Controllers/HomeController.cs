@@ -23,9 +23,7 @@ public class HomeController : Controller
 
         var dtoFeaturedList = _productService.GetFeatureProduct(12); // servisten yanit DTO olarak geldi.
         var featuredProducts = _mapper.Map<List<ProductViewModel>>(dtoFeaturedList); // DTO listesini VM listesine donusturur.
-        model.Products = featuredProducts; // modelin icine listeyi koy
-
-
+        model.Products = featuredProducts; // modelin icine listeyi koyk
         return View(model);
     }
 
