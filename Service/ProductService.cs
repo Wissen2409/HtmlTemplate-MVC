@@ -3,6 +3,7 @@ public interface IProductService
 {
     public List<ProductDTO> GetFeatureProduct(int productCount);
     public ProductDTO ProductDetail(int productid);
+    public FilterDTO Filter(FilterDTO model);
 }
 public class ProductService : IProductService
 {
@@ -36,4 +37,18 @@ public class ProductService : IProductService
         // };
     }
 
+    public FilterDTO Filter(FilterDTO model)
+    {
+        if (model.SelCategoryId == 0) // kategory secimi yapilmamissa
+        {
+            model.Categories = _productRepository.GetAllCategories(); // repodan Category listesini isteyip modelin icine koy
+            return model;
+        }
+        // Kategory id 0 degilse
+
+        model.SubCategories = _productRepository.GetSubCategoriesByCategoryId(model.SelCategoryId);
+        // repodan secilmis olan kategory'e ait sub category listesini cekip modelin icine koy
+
+        return model;
+    }
 }
