@@ -92,8 +92,11 @@ public class ProductRepository : IProductRepository
     /// </summary>
     public List<ProductDTO> GetProductsByCategoryandSubCategory(int productRequested, int? categoryId = 0, int? subCategoryId = 0) // dinamik olarak sorgu yapacak
     {
-        var query = _context.Products.AsQueryable(); // tabloya eristik ancak sorguyu henuz gondermedi. Dinamik olarak sorguyu hazirlayip en son gondercem
-
+        var query = _context.Products
+        .Include(p => p.ProductProductPhotos)
+        .ThenInclude(t => t.ProductPhoto)
+        .AsQueryable();
+        // tabloya eristik ancak sorguyu henuz gondermedi. Dinamik olarak sorguyu hazirlayip en son gondercem
 
         if (categoryId.HasValue && categoryId != 0)
         {
@@ -113,7 +116,8 @@ public class ProductRepository : IProductRepository
             Name = p.Name,
             ListPrice = p.ListPrice,
             StandardCost = p.StandardCost,
-            Color = p.Color
+            Color = p.Color,
+            LargePhoto = ImgConverter.ConvertImageToBase64(p.ProductProductPhotos.FirstOrDefault().ProductPhoto.LargePhoto),
         }).ToList(); // Sorgu db'ye gonderildi gelen yanit geri donduruldu
     }
 }
