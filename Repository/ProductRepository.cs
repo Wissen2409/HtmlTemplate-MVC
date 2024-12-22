@@ -10,7 +10,7 @@ public interface IProductRepository
     public ProductDTO ProductDetail(int productid);
     public List<CategoryDTO> GetAllCategories();
     public List<SubCategoryDTO> GetSubCategoriesByCategoryId(int categoryId);
-    public List<ProductDTO> GetProductsByCategoryandSubCategory(int? categoryId, int? subCategoryId);
+    public List<ProductDTO> GetProductsByCategoryandSubCategory(int productRequested, int? categoryId = 0, int? subCategoryId = 0);
 }
 public class ProductRepository : IProductRepository
 {
@@ -86,20 +86,26 @@ public class ProductRepository : IProductRepository
         return subCategories;
     }
 
-
-    public List<ProductDTO> GetProductsByCategoryandSubCategory(int? categoryId, int? subCategoryId) // dinamik olarak sorgu yapacak
+    /// <summary>
+    /// Istenilen miktarda urunleri listeler.
+    /// Ayrica category id ve subcategory id verilerek filtreleme yaparak urunleri listeleyebilir.
+    /// </summary>
+    public List<ProductDTO> GetProductsByCategoryandSubCategory(int productRequested, int? categoryId = 0, int? subCategoryId = 0) // dinamik olarak sorgu yapacak
     {
         var query = _context.Products.AsQueryable(); // tabloya eristik ancak sorguyu henuz gondermedi. Dinamik olarak sorguyu hazirlayip en son gondercem
 
-        if (categoryId != 0)
+
+        if (categoryId.HasValue && categoryId != 0)
         {
-            query = query.Where(p => p.ProductSubcategory.ProductCategoryId == categoryId);
+            query = query.Where(p => p.ProductSubcategory.ProductCategoryId == categoryId); // sorguya kategory id ye gore filtreleme eklendi
         }
 
-        if (subCategoryId != 0)
+        if (subCategoryId.HasValue && subCategoryId != 0)
         {
-            query = query.Where(p => p.ProductSubcategoryId == subCategoryId);
+            query = query.Where(p => p.ProductSubcategoryId == subCategoryId); // sorguya subcategoryid 'ye gore filtreleme eklendi.
         }
+
+        query = query.Where(p => p.ListPrice > 0).Take(productRequested); // sorguya fiyati olmayan urunlerin cikarilmasi kosulu ve take medodu eklendi
 
         return query.Select(p => new ProductDTO
         {
@@ -108,8 +114,6 @@ public class ProductRepository : IProductRepository
             ListPrice = p.ListPrice,
             StandardCost = p.StandardCost,
             Color = p.Color
-        }).ToList();
-
-
+        }).ToList(); // Sorgu db'ye gonderildi gelen yanit geri donduruldu
     }
 }
