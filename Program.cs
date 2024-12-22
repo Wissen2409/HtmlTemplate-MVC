@@ -1,3 +1,5 @@
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using HtmlTemplate_MVC.DataAccessLayer;
 using HtmlTemplate_MVC.DMO;
 using Microsoft.EntityFrameworkCore;
@@ -13,6 +15,12 @@ builder.Services.AddDbContext<AdventureWorksContext>(option =>
 builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
+
+builder.Services.AddFluentValidationAutoValidation(); 
+builder.Services.AddFluentValidationClientsideAdapters(); 
+builder.Services.AddValidatorsFromAssemblyContaining<Program>();
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
