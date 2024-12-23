@@ -5,6 +5,8 @@ public interface IProductService
     public ProductDTO ProductDetail(int productid);
     public List<CategoryDTO> GetCategories();
     public ShopIndexDTO FilterCategoriesAndSubCategories(ShopIndexDTO model);
+    public FilterDTO PopulateFilters();
+    public List<ProductDTO> GetFilteredProducts(FilterDTO filter);
 }
 public class ProductService : IProductService
 {
@@ -36,5 +38,28 @@ public class ProductService : IProductService
         model.SubCategories = _productRepository.GetSubCategoriesByCategoryId(model.SelCategoryId);
         model.Products = _productRepository.GetProductsByCategoryandSubCategory(12, model.SelCategoryId, model.SelSubCategoryId);
         return model;
+    }
+
+    public FilterDTO PopulateFilters()
+    {
+        // Filtreleme için gerekli değerler burada doldurulur
+
+        return new FilterDTO
+        {
+            MinPrice=_productRepository.GetMinPrice(),
+            MaxPrice=_productRepository.GetMaxPrice(),
+            Colors=_productRepository.GetUniqueColors(),
+        };
+    }
+    public List<ProductDTO> GetFilteredProducts(FilterDTO filter)
+    {
+        return _productRepository.GetFilteredProducts(
+
+            filter.SelCategoryId,
+            filter.SelSubCategoryId,
+            filter.SelectedMinPrice,
+            filter.SelectedMaxPrice,
+            filter.SelectedColors
+        );
     }
 }
