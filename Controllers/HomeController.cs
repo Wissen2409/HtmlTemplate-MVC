@@ -9,12 +9,10 @@ public class HomeController : Controller
 {
     private IMapper _mapper;
     private IProductService _productService;
-    private IProductCategoryService _productCategoryService;
-    public HomeController(IProductService productService, IMapper mapper,IProductCategoryService productCategoryService)
+    public HomeController(IProductService productService, IMapper mapper)
     {
         _mapper = mapper;
         _productService = productService;
-        _productCategoryService = productCategoryService;
     }
 
     public IActionResult Index()
@@ -27,12 +25,11 @@ public class HomeController : Controller
         var featuredProducts = _mapper.Map<List<ProductViewModel>>(dtoFeaturedList); // DTO listesini VM listesine donusturur.
         model.Products = featuredProducts; // modelin icine listeyi koyk
 
-        var categoryList = _mapper.Map<List<CategoryVM>>(_productCategoryService.GetAll());
+        var categoryList = _mapper.Map<List<CategoryVM>>(_productService.GetCategories());
         model.Categories = categoryList;
 
         return View(model);
     }
-
 
     public IActionResult ProductDetail(int productId)
     {
