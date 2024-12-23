@@ -13,6 +13,11 @@ public class ShopController : Controller
 
     public IActionResult Index()
     {
+        BreadCrumbViewBagHelper.SetBreadCrumb(ViewData,
+            ("Home", "/"),
+            ("Shop", null)
+            );
+
         ShopIndexVM model = new();
         model.Products = _mapper.Map<List<ProductViewModel>>(_service.GetProducts(9));
         model.Categories = _mapper.Map<List<CategoryVM>>(_service.GetCategories());
@@ -21,6 +26,11 @@ public class ShopController : Controller
     [HttpPost]
     public IActionResult Index(ShopIndexVM model)
     {
+        BreadCrumbViewBagHelper.SetBreadCrumb(ViewData,
+            ("Home", "/"),
+            ("Shop", null)
+            );
+
         var dtoModel = _service.FilterCategoriesAndSubCategories(_mapper.Map<ShopIndexDTO>(model));
         return View(_mapper.Map<ShopIndexVM>(dtoModel));
     }
