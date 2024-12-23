@@ -19,9 +19,7 @@ public class MappingProfile : Profile
         CreateMap<ProductSubcategory, SubCategoryDTO>().ReverseMap();
         CreateMap<SubCategoryDTO, SubCategoryVM>().ReverseMap();
 
-        // Filter sinifi icin mapleme
-        CreateMap<FilterDTO, FilterVM>().ReverseMap();
 
-        
+        CreateMap<ShopIndexVM, ShopIndexDTO>().ReverseMap();
     }
 }

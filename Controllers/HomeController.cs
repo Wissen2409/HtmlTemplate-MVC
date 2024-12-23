@@ -23,7 +23,7 @@ public class HomeController : Controller
         // View modeli initalize edelim 
         IndexViewModel model = new IndexViewModel();
 
-        var dtoFeaturedList = _productService.GetFeatureProduct(12); // servisten yanit DTO olarak geldi.
+        var dtoFeaturedList = _productService.GetProducts(12); // servisten yanit DTO olarak geldi.
         var featuredProducts = _mapper.Map<List<ProductViewModel>>(dtoFeaturedList); // DTO listesini VM listesine donusturur.
         model.Products = featuredProducts; // modelin icine listeyi koyk
 

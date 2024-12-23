@@ -5,4 +5,5 @@ public class ProductDTO : DTOBase
     public string Color { get; set; }
     public decimal StandardCost { get; set; }
     public string Description { get; set; }
+    public string LargePhoto { get; set; }
 }

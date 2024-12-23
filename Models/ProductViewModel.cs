@@ -6,4 +6,5 @@ public class ProductViewModel
     public decimal ListPrice { get; set; }
     public decimal StandardCost { get; set; }
     public string Description { get; set; }
+    public string LargePhoto { get; set; }
 }
