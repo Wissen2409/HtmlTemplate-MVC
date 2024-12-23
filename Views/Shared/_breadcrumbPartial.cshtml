@@ -1,0 +1,19 @@
+<div class="container-fluid">
+    <div class="row px-xl-5">
+        <div class="col-12">
+            <nav class="breadcrumb bg-light mb-30">
+                @foreach (var item in ViewData["Breadcrumb"] as List<BreadcrumbItem>)
+                {
+                    if (!string.IsNullOrEmpty(item.Url)) // url kismi null degilse
+                    {
+                        <a class="breadcrumb-item text-dark" href="@item.Url">@item.Name</a>
+                    }
+                    else // url kismi null ise (breadcrumb son oge)
+                    {
+                        <span class="breadcrumb-item active">@item.Name</span>
+                    }
+                }
+            </nav>
+        </div>
+    </div>
+</div>
