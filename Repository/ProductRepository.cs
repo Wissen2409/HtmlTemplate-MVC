@@ -11,6 +11,7 @@ public interface IProductRepository
     public List<CategoryDTO> GetAllCategories();
     public List<SubCategoryDTO> GetSubCategoriesByCategoryId(int categoryId);
     public List<ProductDTO> GetProductsByCategoryandSubCategory(int productRequested, int? categoryId = 0, int? subCategoryId = 0);
+    public List<ProductDTO> GetProductByName(string searchString);
 }
 public class ProductRepository : IProductRepository
 {
@@ -119,5 +120,20 @@ public class ProductRepository : IProductRepository
             Color = p.Color,
             LargePhoto = ImgConverter.ConvertImageToBase64(p.ProductProductPhotos.FirstOrDefault().ProductPhoto.LargePhoto),
         }).ToList(); // Sorgu db'ye gonderildi gelen yanit geri donduruldu
+    }
+    public List<ProductDTO> GetProductByName(string searchString)
+    {
+       var searchcontext=  _context.Products
+       .Where(s => s.Name.Contains(searchString))
+       .Where(s => s.ListPrice > 0)
+       .Select(s => new ProductDTO
+        {   ProductId = s.ProductId,
+            Name = s.Name,
+            ListPrice = s.ListPrice,
+            StandardCost = s.StandardCost,
+            Color = s.Color,
+            LargePhoto = ImgConverter.ConvertImageToBase64(s.ProductProductPhotos.FirstOrDefault().ProductPhoto.LargePhoto),
+        }).ToList(); 
+        return searchcontext;
     }
 }

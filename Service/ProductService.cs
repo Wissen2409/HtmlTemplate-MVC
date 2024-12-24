@@ -5,6 +5,7 @@ public interface IProductService
     public ProductDTO ProductDetail(int productid);
     public List<CategoryDTO> GetCategories();
     public ShopIndexDTO FilterCategoriesAndSubCategories(ShopIndexDTO model);
+    public List<ProductDTO> GetProductByName(string searchString);
 }
 public class ProductService : IProductService
 {
@@ -36,5 +37,9 @@ public class ProductService : IProductService
         model.SubCategories = _productRepository.GetSubCategoriesByCategoryId(model.SelCategoryId);
         model.Products = _productRepository.GetProductsByCategoryandSubCategory(12, model.SelCategoryId, model.SelSubCategoryId);
         return model;
+    }
+    public List<ProductDTO> GetProductByName(string searchString)
+    {
+        return _productRepository.GetProductByName(searchString);
     }
 }
