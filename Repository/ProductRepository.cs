@@ -12,6 +12,11 @@ public interface IProductRepository
     public List<SubCategoryDTO> GetSubCategoriesByCategoryId(int categoryId);
     public List<ProductDTO> GetProductsByCategoryandSubCategory(int productRequested, int? categoryId = 0, int? subCategoryId = 0);
     public List<ProductDTO> GetProductByName(string searchString);
+    public decimal GetMinPrice();
+    public decimal GetMaxPrice();
+    public List<string> GetUniqueColors();
+    public List<ProductDTO> GetFilteredProducts(int? categoryId, int? subCategoryId, decimal? minPrice, decimal? maxPrice, List<string> selectedColors);
+
 }
 public class ProductRepository : IProductRepository
 {
@@ -121,6 +126,7 @@ public class ProductRepository : IProductRepository
             LargePhoto = ImgConverter.ConvertImageToBase64(p.ProductProductPhotos.FirstOrDefault().ProductPhoto.LargePhoto),
         }).ToList(); // Sorgu db'ye gonderildi gelen yanit geri donduruldu
     }
+
     public List<ProductDTO> GetProductByName(string searchString)
     {
        var searchcontext=  _context.Products
@@ -135,5 +141,61 @@ public class ProductRepository : IProductRepository
             LargePhoto = ImgConverter.ConvertImageToBase64(s.ProductProductPhotos.FirstOrDefault().ProductPhoto.LargePhoto),
         }).ToList(); 
         return searchcontext;
+    }
+
+
+    // Filter By Color ve Filter By Price alanları
+
+    public decimal GetMinPrice()
+    {
+        return _context.Products.Min(p => p.ListPrice);
+    }
+
+    public decimal GetMaxPrice()
+    {
+        return _context.Products.Max(p => p.ListPrice);
+    }
+
+    public List<string> GetUniqueColors()
+    {
+        return _context.Products
+        .Where(p => !string.IsNullOrEmpty(p.Color))
+        .Select(p => p.Color)
+        .Distinct() // Tekrarlayan elemanları çıkarmak için.
+        .ToList();
+    }
+
+    public List<ProductDTO> GetFilteredProducts(int? categoryId, int? subCategoryId, decimal? minPrice, decimal? maxPrice, List<string> selectedColors)
+    {
+        var query = _context.Products
+        .Include(p => p.ProductSubcategory)
+        .AsQueryable(); // query üzerinde ek filtreleme yapılabilmesini sağlar.
+
+        // Dinamik Filtreleme
+
+        if (categoryId.HasValue && categoryId > 0)
+            query = query.Where(p => p.ProductSubcategory.ProductCategoryId == categoryId);
+            
+        if (subCategoryId.HasValue && subCategoryId > 0)
+            query = query.Where(p => p.ProductSubcategoryId == subCategoryId);
+
+        if (minPrice.HasValue)
+            query = query.Where(p => p.ListPrice >= minPrice.Value);
+
+        if (maxPrice.HasValue)
+            query = query.Where(p => p.ListPrice <= maxPrice.Value);
+
+        if (selectedColors != null && selectedColors.Any())
+            query = query.Where(p => selectedColors.Contains(p.Color));
+
+        return query.Select(p => new ProductDTO
+        {
+            ProductId = p.ProductId,
+            Name = p.Name,
+            ListPrice = p.ListPrice,
+            StandardCost = p.StandardCost,
+            Color = p.Color,
+        }).ToList();
+
     }
 }
