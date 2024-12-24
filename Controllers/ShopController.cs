@@ -8,24 +8,24 @@ public class ShopController : Controller
     private AdventureWorksContext _context;
     private IMapper _mapper;
     private IProductService _service;
-    public ShopController(IMapper mapper, IProductService service,AdventureWorksContext context)
+    public ShopController(IMapper mapper, IProductService service, AdventureWorksContext context)
     {
-        _context=context;
+        _context = context;
         _mapper = mapper;
         _service = service;
     }
 
 
 
-    public IActionResult Index(int selectedID = 0,string searchString = "")
-{
-    BreadCrumbViewBagHelper.SetBreadCrumb(ViewData,("Home", "/"),("Shop", null));
+    public IActionResult Index(int selectedID = 0, string searchString = "")
+    {
+        BreadCrumbViewBagHelper.SetBreadCrumb(ViewData, ("Home", "/"), ("Shop", null));
 
-if (!string.IsNullOrEmpty(searchString))
+        if (!string.IsNullOrEmpty(searchString))
         {
             var dtoResult = _service.GetProductByName(searchString);
             var result = _mapper.Map<List<ProductViewModel>>(dtoResult);
-        
+
             ShopIndexVM searchModel = new ShopIndexVM();
             searchModel.Categories = _mapper.Map<List<CategoryVM>>(_service.GetCategories());
             searchModel.Products = result;
@@ -35,12 +35,8 @@ if (!string.IsNullOrEmpty(searchString))
         }
 
 
-    if (selectedID == 0)    
-    {
-        
-        ShopIndexVM model = new();
-
-
+        if (selectedID == 0)
+        {
 
             ShopIndexVM model = new();
 
@@ -84,7 +80,5 @@ if (!string.IsNullOrEmpty(searchString))
         // Form gönderimi için Index metoduna yönlendirme yapıyoruz
         return RedirectToAction("Index", "Shop", new { selectedID = selectedCategoryID });
     }
-}
-
 }
 

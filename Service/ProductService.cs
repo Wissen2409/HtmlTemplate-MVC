@@ -51,7 +51,7 @@ public class ProductService : IProductService
     public List<ProductDTO> GetProductByName(string searchString)
     {
         return _productRepository.GetProductByName(searchString);
-
+    }
 
     public FilterDTO PopulateFilters()
     {
