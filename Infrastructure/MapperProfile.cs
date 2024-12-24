@@ -21,5 +21,9 @@ public class MappingProfile : Profile
 
 
         CreateMap<ShopIndexVM, ShopIndexDTO>().ReverseMap();
+        
+         // Filter maplendi
+        CreateMap<FilterDTO, ShopIndexVM>().ReverseMap();
+
     }
 }
