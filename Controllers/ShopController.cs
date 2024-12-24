@@ -14,32 +14,30 @@ public class ShopController : Controller
 
 
     public IActionResult Index(int selectedID = 0)
-{
-    if (selectedID == 0)    
     {
-        BreadCrumbViewBagHelper.SetBreadCrumb(ViewData,
-            ("Home", "/"),
-            ("Shop", null)
-            );
+        BreadCrumbViewBagHelper.SetBreadCrumb(ViewData, ("Home", "/"), ("Shop", null));
 
-        ShopIndexVM model = new();
+        if (selectedID == 0)
+        {
+            ShopIndexVM model = new();
 
-        model.Products = _mapper.Map<List<ProductViewModel>>(_service.GetProducts(9));
-        model.Categories = _mapper.Map<List<CategoryVM>>(_service.GetCategories());
+            model.Products = _mapper.Map<List<ProductViewModel>>(_service.GetProducts(9));
+            model.Categories = _mapper.Map<List<CategoryVM>>(_service.GetCategories());
 
-    return View(model);
+            return View(model);
+        }
+        else
+        {
+            ShopIndexVM model = new ShopIndexVM
+            {
+                SelCategoryId = selectedID
+            };
+            var dtoModel = _service.FilterCategoriesAndSubCategories(_mapper.Map<ShopIndexDTO>(model));
+            return View(_mapper.Map<ShopIndexVM>(dtoModel));
+
+        }
+
     }
-    else 
-    {
-        ShopIndexVM model = new ShopIndexVM{
-            SelCategoryId = selectedID
-        };
-        var dtoModel = _service.FilterCategoriesAndSubCategories(_mapper.Map<ShopIndexDTO>(model));
-        return View(_mapper.Map<ShopIndexVM>(dtoModel));
-
-    }
-
-}
 
     [HttpPost]
     public IActionResult Index(ShopIndexVM model)
@@ -54,9 +52,9 @@ public class ShopController : Controller
     }
 
     public IActionResult Click(int selectedCategoryID)
-    {  
+    {
         // Form gönderimi için Index metoduna yönlendirme yapıyoruz
-        return RedirectToAction("Index","Shop",new{selectedID = selectedCategoryID});
+        return RedirectToAction("Index", "Shop", new { selectedID = selectedCategoryID });
     }
 
 }

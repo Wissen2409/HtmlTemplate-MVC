@@ -35,6 +35,11 @@ public class ProductService : IProductService
         model.Categories = _productRepository.GetAllCategories();
         model.SubCategories = _productRepository.GetSubCategoriesByCategoryId(model.SelCategoryId);
         model.Products = _productRepository.GetProductsByCategoryandSubCategory(12, model.SelCategoryId, model.SelSubCategoryId);
+        if (model.Products.Count < 1)
+        {
+            model.Products = _productRepository.GetProductsByCategoryandSubCategory(12, model.SelCategoryId);
+            model.SelSubCategoryId = 0;
+        }
         return model;
     }
 }
