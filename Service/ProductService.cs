@@ -38,6 +38,11 @@ public class ProductService : IProductService
         model.SubCategories = _productRepository.GetSubCategoriesByCategoryId(model.SelCategoryId);
         // eger renk ve ya fiyat secilmisse senin sorgun calismali, secilmediyse benim.
         model.Products = _productRepository.GetProductsByCategoryandSubCategory(12, model.SelCategoryId, model.SelSubCategoryId);
+        if (model.Products.Count < 1)
+        {
+            model.Products = _productRepository.GetProductsByCategoryandSubCategory(12, model.SelCategoryId);
+            model.SelSubCategoryId = 0;
+        }
         return model;
     }
 
