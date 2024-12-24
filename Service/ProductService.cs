@@ -36,6 +36,7 @@ public class ProductService : IProductService
     {
         model.Categories = _productRepository.GetAllCategories();
         model.SubCategories = _productRepository.GetSubCategoriesByCategoryId(model.SelCategoryId);
+        // eger renk ve ya fiyat secilmisse senin sorgun calismali, secilmediyse benim.
         model.Products = _productRepository.GetProductsByCategoryandSubCategory(12, model.SelCategoryId, model.SelSubCategoryId);
         return model;
     }
@@ -46,9 +47,9 @@ public class ProductService : IProductService
 
         return new FilterDTO
         {
-            MinPrice=_productRepository.GetMinPrice(),
-            MaxPrice=_productRepository.GetMaxPrice(),
-            Colors=_productRepository.GetUniqueColors(),
+            MinPrice = _productRepository.GetMinPrice(),
+            MaxPrice = _productRepository.GetMaxPrice(),
+            Colors = _productRepository.GetUniqueColors(),
         };
     }
     public List<ProductDTO> GetFilteredProducts(FilterDTO filter)

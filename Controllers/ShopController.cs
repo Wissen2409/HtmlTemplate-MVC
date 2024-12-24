@@ -15,18 +15,15 @@ public class ShopController : Controller
 
     public IActionResult Index(int selectedID = 0)
     {
+        BreadCrumbViewBagHelper.SetBreadCrumb(ViewData, ("Home", "/"), ("Shop", null));
         if (selectedID == 0)
         {
-            BreadCrumbViewBagHelper.SetBreadCrumb(ViewData,
-                ("Home", "/"),
-                ("Shop", null)
-                );
 
             ShopIndexVM model = new();
 
             model.Products = _mapper.Map<List<ProductViewModel>>(_service.GetProducts(9));
             model.Categories = _mapper.Map<List<CategoryVM>>(_service.GetCategories());
-        
+
             var filters = _service.PopulateFilters();
             model.MinPrice = filters.MinPrice;
             model.MaxPrice = filters.MaxPrice;
