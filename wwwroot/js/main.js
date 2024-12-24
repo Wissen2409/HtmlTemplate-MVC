@@ -108,4 +108,15 @@
     });
 
 })(jQuery);
+document.getElementById("searchButton").addEventListener("click", function() {
+    const searchInput = document.getElementById("searchInput").value;
+    const form = document.getElementById("searchForm");
 
+    if (searchInput.trim() !== "") {
+        // Formun action kısmına dinamik olarak URL oluştur
+        form.action =`/Search/Search?searchstring=${searchInput}`;
+        form.submit(); // Formu gönder
+    } else {
+        alert("Lütfen bir arama terimi girin.");
+    }
+});
