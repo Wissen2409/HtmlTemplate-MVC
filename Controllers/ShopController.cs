@@ -6,6 +6,7 @@ public class ShopController : Controller
 {
     private IMapper _mapper;
     private IProductService _service;
+    private const int pageSize = 12; //her sayfada gosterilecek urun sayisi
     public ShopController(IMapper mapper, IProductService service)
     {
         _mapper = mapper;
@@ -13,16 +14,20 @@ public class ShopController : Controller
     }
 
 
-    public IActionResult Index(int selectedID = 0)
+    public IActionResult Index(int selectedCatID = 0)
     {
+
         BreadCrumbViewBagHelper.SetBreadCrumb(ViewData, ("Home", "/"), ("Shop", null));
 
-        if (selectedID == 0)
+        if (selectedCatID == 0)
         {
-            ShopIndexVM model = new();
+            ShopIndexVM createdModel = new()
+            {
+                CurrentPage = 1,
+            };
+            var dtoModel = _service.FilterCategoriesAndSubCategories(_mapper.Map<ShopIndexDTO>(createdModel), pageSize);
 
-            model.Products = _mapper.Map<List<ProductViewModel>>(_service.GetProducts(9));
-            model.Categories = _mapper.Map<List<CategoryVM>>(_service.GetCategories());
+            var model = _mapper.Map<ShopIndexVM>(dtoModel);
 
             return View(model);
         }
@@ -30,31 +35,34 @@ public class ShopController : Controller
         {
             ShopIndexVM model = new ShopIndexVM
             {
-                SelCategoryId = selectedID
+                SelCategoryId = selectedCatID,
+                CurrentPage = 1,
             };
-            var dtoModel = _service.FilterCategoriesAndSubCategories(_mapper.Map<ShopIndexDTO>(model));
+            var dtoModel = _service.FilterCategoriesAndSubCategories(_mapper.Map<ShopIndexDTO>(model), pageSize);
             return View(_mapper.Map<ShopIndexVM>(dtoModel));
-
         }
+
 
     }
 
     [HttpPost]
     public IActionResult Index(ShopIndexVM model)
     {
-        BreadCrumbViewBagHelper.SetBreadCrumb(ViewData,
-            ("Home", "/"),
-            ("Shop", null)
-            );
 
-        var dtoModel = _service.FilterCategoriesAndSubCategories(_mapper.Map<ShopIndexDTO>(model));
+        BreadCrumbViewBagHelper.SetBreadCrumb(ViewData, ("Home", "/"), ("Shop", null));
+        if (model.CurrentPage < 1)
+        {
+            model.CurrentPage = 1;
+        }
+        model.SkipCount = (model.CurrentPage - 1) * pageSize;
+        var dtoModel = _service.FilterCategoriesAndSubCategories(_mapper.Map<ShopIndexDTO>(model), pageSize);
         return View(_mapper.Map<ShopIndexVM>(dtoModel));
     }
 
     public IActionResult Click(int selectedCategoryID)
     {
         // Form gönderimi için Index metoduna yönlendirme yapıyoruz
-        return RedirectToAction("Index", "Shop", new { selectedID = selectedCategoryID });
+        return RedirectToAction("Index", "Shop", new { selectedCatID = selectedCategoryID });
     }
 
 }

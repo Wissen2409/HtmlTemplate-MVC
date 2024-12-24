@@ -10,7 +10,9 @@ public interface IProductRepository
     public ProductDTO ProductDetail(int productid);
     public List<CategoryDTO> GetAllCategories();
     public List<SubCategoryDTO> GetSubCategoriesByCategoryId(int categoryId);
-    public List<ProductDTO> GetProductsByCategoryandSubCategory(int productRequested, int? categoryId = 0, int? subCategoryId = 0);
+    public List<ProductDTO> GetProductsByCategoryandSubCategory(int productRequested, int skipCount = 0, int? categoryId = 0, int? subCategoryId = 0);
+    public int GetProductCountByCategoryandSubCategory(int? categoryId = 0, int? subCategoryId = 0);
+
 }
 public class ProductRepository : IProductRepository
 {
@@ -90,7 +92,7 @@ public class ProductRepository : IProductRepository
     /// Istenilen miktarda urunleri listeler.
     /// Ayrica category id ve subcategory id verilerek filtreleme yaparak urunleri listeleyebilir.
     /// </summary>
-    public List<ProductDTO> GetProductsByCategoryandSubCategory(int productRequested, int? categoryId = 0, int? subCategoryId = 0) // dinamik olarak sorgu yapacak
+    public List<ProductDTO> GetProductsByCategoryandSubCategory(int productCount, int skipCount = 0, int? categoryId = 0, int? subCategoryId = 0) // dinamik olarak sorgu yapacak
     {
         var query = _context.Products
         .Include(p => p.ProductProductPhotos)
@@ -108,7 +110,10 @@ public class ProductRepository : IProductRepository
             query = query.Where(p => p.ProductSubcategoryId == subCategoryId); // sorguya subcategoryid 'ye gore filtreleme eklendi.
         }
 
-        query = query.Where(p => p.ListPrice > 0).Take(productRequested); // sorguya fiyati olmayan urunlerin cikarilmasi kosulu ve take medodu eklendi
+        query = query
+            .Where(p => p.ListPrice > 0)
+            .Skip(skipCount)
+            .Take(productCount); // sorguya fiyati olmayan urunlerin cikarilmasi kosulu ve take medodu eklendi
 
         return query.Select(p => new ProductDTO
         {
@@ -120,4 +125,30 @@ public class ProductRepository : IProductRepository
             LargePhoto = ImgConverter.ConvertImageToBase64(p.ProductProductPhotos.FirstOrDefault().ProductPhoto.LargePhoto),
         }).ToList(); // Sorgu db'ye gonderildi gelen yanit geri donduruldu
     }
+
+
+    /// <summary>
+    /// Verilen CategoryId ve ya SubCategoryId den kac adet urun oldugunu doner.
+    /// Parametre verilmeden gonderilse Toplam kac urun oldugunu doner.
+    /// </summary>
+    /// <param name="categoryId">CategoryId</param>
+    /// <param name="subCategoryId">SubCategoryId</param>
+    /// <returns></returns>
+    public int GetProductCountByCategoryandSubCategory(int? categoryId = 0, int? subCategoryId = 0)
+    {
+        var query = _context.Products.AsQueryable();
+
+        if (categoryId.HasValue && categoryId != 0)
+        {
+            query = query.Where(p => p.ProductSubcategory.ProductCategoryId == categoryId);
+        }
+
+        if (subCategoryId.HasValue && subCategoryId != 0)
+        {
+            query = query.Where(p => p.ProductSubcategoryId == subCategoryId);
+        }
+
+        return query.Where(p => p.ListPrice > 0).Count();
+    }
+
 }
