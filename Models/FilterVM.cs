@@ -6,15 +6,5 @@ public class FilterVM
     public List<SubCategoryVM> SubCategories { get; set; }
 }
 
-public class CategoryVM
-{
-    public int ProductCategoryId { get; set; }
-    public string Name { get; set; }
-}
 
-public class SubCategoryVM
-{
-    public int ProductCategoryId { get; set; }
-    public int ProductSubCategoryId { get; set; }
-    public string Name { get; set; }
-}
+

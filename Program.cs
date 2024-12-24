@@ -16,9 +16,11 @@ builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 
+
 builder.Services.AddFluentValidationAutoValidation(); 
 builder.Services.AddFluentValidationClientsideAdapters(); 
 builder.Services.AddValidatorsFromAssemblyContaining<Program>();
+
 
 
 var app = builder.Build();
