@@ -51,10 +51,11 @@ public class ShopController : Controller
         return View(_mapper.Map<ShopIndexVM>(dtoModel));
     }
 
-    public IActionResult Click(int selectedCategoryID)
+    public IActionResult SelectCategory(int selectedCategoryID)
     {
         // Form gönderimi için Index metoduna yönlendirme yapıyoruz
         return RedirectToAction("Index", "Shop", new { selectedID = selectedCategoryID });
     }
+    
 
 }
