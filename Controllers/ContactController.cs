@@ -18,6 +18,7 @@ public class ContactController : Controller
     [HttpPost]
     public async Task<IActionResult> Index(ContactVM model)
     {
+        BreadCrumbViewBagHelper.SetBreadCrumb(ViewData, ("Home", "/"), ("Contact", null));
         if (!ModelState.IsValid)
         {
             return View(model);
@@ -28,11 +29,10 @@ public class ContactController : Controller
         }
         catch (Exception ex)
         {
-            BreadCrumbViewBagHelper.SetBreadCrumb(ViewData, ("Home", "/"), ("Contact", null));
+
             TempData["FailMessage"] = "Error occured ->" + ex.Message;
             return View(model);
         }
-
         TempData["SuccessMessage"] = "Mail Sent Succesfully";
         return RedirectToAction("Index", "Contact");
     }
