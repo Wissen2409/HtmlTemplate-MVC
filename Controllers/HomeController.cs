@@ -33,20 +33,7 @@ public class HomeController : Controller
 
     public IActionResult ProductDetail(int productId)
     {
-
-        return View(_mapper.Map<ProductViewModel>(_productService.ProductDetail(productId))); // servisten aldigin DTO yaniti automapper ile VM'e cevirip View'a model olarak yolla
-
-        // var returnData = _productService.ProductDetail(productId);
-
-        // return View(new ProductViewModel
-        // {
-        //     Color = returnData.Color,
-        //     Description = returnData.Description,
-        //     Id = returnData.Id,
-        //     ListPrice = returnData.ListPrice,
-        //     Name = returnData.ProductName,
-        //     StandardCost = returnData.StandardCost
-        // });
+        return View(_mapper.Map<ProductViewModel>(_productService.ProductDetail(productId)));
     }
     public IActionResult Privacy()
     {

@@ -5,12 +5,10 @@ using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 
 public class ShopController : Controller
 {
-    private AdventureWorksContext _context;
     private IMapper _mapper;
     private IProductService _service;
-    public ShopController(IMapper mapper, IProductService service, AdventureWorksContext context)
+    public ShopController(IMapper mapper, IProductService service)
     {
-        _context = context;
         _mapper = mapper;
         _service = service;
     }
