@@ -107,12 +107,13 @@ public class ProductRepository : IProductRepository
         if (categoryId.HasValue && categoryId != 0)
         {
             query = query.Where(p => p.ProductSubcategory.ProductCategoryId == categoryId); // sorguya kategory id ye gore filtreleme eklendi
+
+            if (subCategoryId.HasValue && subCategoryId != 0)
+            {
+                query = query.Where(p => p.ProductSubcategoryId == subCategoryId); // sorguya subcategoryid 'ye gore filtreleme eklendi.
+            }
         }
 
-        if (subCategoryId.HasValue && subCategoryId != 0)
-        {
-            query = query.Where(p => p.ProductSubcategoryId == subCategoryId); // sorguya subcategoryid 'ye gore filtreleme eklendi.
-        }
 
         query = query.Where(p => p.ListPrice > 0).Take(productRequested); // sorguya fiyati olmayan urunlerin cikarilmasi kosulu ve take medodu eklendi
 
@@ -129,17 +130,18 @@ public class ProductRepository : IProductRepository
 
     public List<ProductDTO> GetProductByName(string searchString)
     {
-       var searchcontext=  _context.Products
-       .Where(s => s.Name.Contains(searchString))
-       .Where(s => s.ListPrice > 0)
-       .Select(s => new ProductDTO
-        {   ProductId = s.ProductId,
+        var searchcontext = _context.Products
+        .Where(s => s.Name.Contains(searchString))
+        .Where(s => s.ListPrice > 0)
+        .Select(s => new ProductDTO
+        {
+            ProductId = s.ProductId,
             Name = s.Name,
             ListPrice = s.ListPrice,
             StandardCost = s.StandardCost,
             Color = s.Color,
             LargePhoto = ImgConverter.ConvertImageToBase64(s.ProductProductPhotos.FirstOrDefault().ProductPhoto.LargePhoto),
-        }).ToList(); 
+        }).ToList();
         return searchcontext;
     }
 
@@ -175,7 +177,7 @@ public class ProductRepository : IProductRepository
 
         if (categoryId.HasValue && categoryId > 0)
             query = query.Where(p => p.ProductSubcategory.ProductCategoryId == categoryId);
-            
+
         if (subCategoryId.HasValue && subCategoryId > 0)
             query = query.Where(p => p.ProductSubcategoryId == subCategoryId);
 

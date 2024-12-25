@@ -4,7 +4,7 @@
     // Shop Sayfasi Dropdown Filtre icin submit fonksiyonu
     $(document).ready(function () {   // sayfa yukendikten sonra fonksiyonu hazirla
         $(".auto-submit").on("change", function () { // auto-submit classi olan butun dropdownlari 'change' eventi icin dinle
-            $("#dropdownFilterForm").submit(); // formu gonder
+            $("#filterForm").submit(); // formu gonder
         })
     })
 
@@ -108,13 +108,13 @@
     });
 
 })(jQuery);
-document.getElementById("searchButton").addEventListener("click", function() {
+document.getElementById("searchButton").addEventListener("click", function () {
     const searchInput = document.getElementById("searchInput").value;
     const form = document.getElementById("searchForm");
 
     if (searchInput.trim() !== "") {
         // Formun action kısmına dinamik olarak URL oluştur
-        form.action =`/Search/Search?searchstring=${searchInput}`;
+        form.action = `/Search/Search?searchstring=${searchInput}`;
         form.submit(); // Formu gönder
     } else {
         alert("Lütfen bir arama terimi girin.");

@@ -4,7 +4,7 @@ public interface IProductService
     public List<ProductDTO> GetProducts(int productCount, int categoryId = 0, int subCategoryId = 0);
     public ProductDTO ProductDetail(int productid);
     public List<CategoryDTO> GetCategories();
-    public ShopIndexDTO FilterCategoriesAndSubCategories(ShopIndexDTO model);
+    public List<SubCategoryDTO> GetSubCategoriesByCategoryId(int selCategoryId);
     public List<ProductDTO> GetProductByName(string searchString);
     public FilterDTO PopulateFilters();
     public List<ProductDTO> GetFilteredProducts(FilterDTO filter);
@@ -21,7 +21,12 @@ public class ProductService : IProductService
 
     public List<ProductDTO> GetProducts(int productCount, int categoryId = 0, int subCategoryId = 0)
     {
-        return _productRepository.GetProductsByCategoryandSubCategory(productCount, categoryId, subCategoryId);
+        var result = _productRepository.GetProductsByCategoryandSubCategory(productCount, categoryId, subCategoryId);
+        if (result.Count < 1)
+        {
+            result = _productRepository.GetProductsByCategoryandSubCategory(productCount, categoryId);
+        }
+        return result;
     }
 
     public ProductDTO ProductDetail(int productid)
@@ -34,18 +39,9 @@ public class ProductService : IProductService
         return _productRepository.GetAllCategories();
     }
 
-    public ShopIndexDTO FilterCategoriesAndSubCategories(ShopIndexDTO model)
+    public List<SubCategoryDTO> GetSubCategoriesByCategoryId(int selCategoryId)
     {
-        model.Categories = _productRepository.GetAllCategories();
-        model.SubCategories = _productRepository.GetSubCategoriesByCategoryId(model.SelCategoryId);
-        // eger renk ve ya fiyat secilmisse senin sorgun calismali, secilmediyse benim.
-        model.Products = _productRepository.GetProductsByCategoryandSubCategory(12, model.SelCategoryId, model.SelSubCategoryId);
-        if (model.Products.Count < 1)
-        {
-            model.Products = _productRepository.GetProductsByCategoryandSubCategory(12, model.SelCategoryId);
-            model.SelSubCategoryId = 0;
-        }
-        return model;
+        return _productRepository.GetSubCategoriesByCategoryId(selCategoryId);
     }
 
     public List<ProductDTO> GetProductByName(string searchString)
