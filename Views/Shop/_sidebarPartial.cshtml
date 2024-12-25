@@ -6,43 +6,69 @@
             Category</span>
     </h5>
     <div class="bg-light p-4 mb-30">
-        <form id="dropdownFilterForm" action="/Shop/Index" method="post">
-            @Html.DropDownListFor(s => s.SelCategoryId, new SelectList(Model.Categories, "ProductCategoryId", "Name"),
-                     "Select a Category", new { @name = "Filters.SelCategoryId", @class = "auto-submit" })
-            @if (Model.SelCategoryId != 0)
+        <form id="filterForm" action="/Shop/Index" method="post">
+
+            <!-- Ana Kategori Secimi -->
+            <div class="form-group">
+                <h5>Categories</h5>
+                @foreach (var category in Model.Categories ?? new List<CategoryVM>())
+                {
+                    <div class="form-check">
+                        <input type="radio" class="form-check-input auto-submit" name="SelCategoryId"
+                            value="@category.ProductCategoryId" id="category-@category.ProductCategoryId"
+                        @(Model.SelCategoryId == category.ProductCategoryId ? "checked" : "") />
+                        <label class="form-check-label" for="category-@category.ProductCategoryId">@category.Name</label>
+                    </div>
+                }
+            </div>
+
+            <!-- Alt Kategori Secimi -->
+            @if (Model.SelCategoryId > 0 && Model.SubCategories != null)
             {
-                @Html.DropDownListFor(s => s.SelSubCategoryId, new SelectList(Model.SubCategories, "ProductSubCategoryId",
-                         "Name"), "Select a Sub Category", new { @name = "Filters.SelSubCategoryId", @class = "auto-submit" })
+                <div class="form-group">
+                    <h5>Sub Categories</h5>
+                    @foreach (var subCategory in Model.SubCategories ?? new List<SubCategoryVM>())
+                    {
+                        <div class="form-check">
+                            <input type="radio" class="form-check-input auto-submit" name="SelSubCategoryId"
+                                value="@subCategory.ProductSubCategoryId" id="subcategory-@subCategory.ProductSubCategoryId"
+                            @(Model.SelSubCategoryId == subCategory.ProductSubCategoryId ? "checked" : "") />
+                            <label class="form-check-label" for="subcategory-@subCategory.ProductSubCategoryId">
+                                @subCategory.Name
+                            </label>
+                        </div>
+                    }
+                </div>
             }
 
             <!-- Fiyat Aralığı -->
-        <div class="form-group">
-            <label for="minPrice">Min Price</label>
-            <input type="number" id="minPrice" name="MinPrice" value="@Model.MinPrice" class="form-control" />
-        </div>
-        <div class="form-group">
-            <label for="maxPrice">Max Price</label>
-            <input type="number" id="maxPrice" name="MaxPrice" value="@Model.MaxPrice" class="form-control" />
-        </div>
+            <div class="form-group">
+                <label for="minPrice">Min Price</label>
+                <input type="number" id="minPrice" name="MinPrice" value="@Model.MinPrice" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label for="maxPrice">Max Price</label>
+                <input type="number" id="maxPrice" name="MaxPrice" value="@Model.MaxPrice" class="form-control" />
+            </div>
 
-        <!-- Renk Seçimi -->
-        <div class="form-group">
-            <h5>Colors</h5>
-            @foreach (var color in Model.Colors ?? new List<string>())
-            {
-                <div class="form-check">
-                    <input type="checkbox" class="form-check-input" name="Colors" value="@color" id="color-@color" />
-                    <label class="form-check-label" for="color-@color">@color</label>
-                </div>
-            }
-        </div>
+            <!-- Renk Seçimi -->
+            <div class="form-group">
+                <h5>Colors</h5>
+                @foreach (var color in Model.Colors ?? new List<string>())
+                {
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" name="Colors" value="@color" id="color-@color" />
+                        <label class="form-check-label" for="color-@color">@color</label>
+                    </div>
+                }
+            </div>
 
-        <!-- Filtre Uygula Butonu -->
-        <button type="submit" class="btn btn-primary">Apply Filters</button>
-            
+            <!-- Filtre Uygula Butonu -->
+            <button type="submit" class="btn btn-primary">Apply Filters</button>
+
         </form>
 
-  
-</div>
-    
+
+    </div>
+
 </div>
