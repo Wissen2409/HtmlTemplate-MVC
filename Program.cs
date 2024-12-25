@@ -15,10 +15,10 @@ builder.Services.AddDbContext<AdventureWorksContext>(option =>
 builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
+builder.Services.AddTransient<SendMail>();
 
-
-builder.Services.AddFluentValidationAutoValidation(); 
-builder.Services.AddFluentValidationClientsideAdapters(); 
+builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddFluentValidationClientsideAdapters();
 builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 
 
