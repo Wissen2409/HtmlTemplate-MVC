@@ -115,8 +115,7 @@ public class ProductRepository : IProductRepository
             }
         }
 
-//// Sorted seçildiyse ilgili işlem burada databaseden çekilmeden yapılması gerekiyor. Ürün adeti sorun çıkarmaması için ;
-
+//// Sorted seçildiyse ilgili işlem burada databaseden çekilmeden yapılması gerekiyor. Ürün adeti sorun çıkarmaması için where koşulundan önce eklendi ;
          switch (selectedSorted)
         {
             case "PriceAsc":
@@ -131,8 +130,8 @@ public class ProductRepository : IProductRepository
             case "NameDesc":
             query =  query.OrderByDescending(x=>x.Name);
             break;
+            
         }
-
 ////////////////////
 
         query = query.Where(p => p.ListPrice > 0).Take(productRequested); // sorguya fiyati olmayan urunlerin cikarilmasi kosulu ve take medodu eklendi
