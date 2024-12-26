@@ -1,7 +1,7 @@
 
 public interface IProductService
 {
-    public List<ProductDTO> GetProducts(int productCount, int categoryId = 0, int subCategoryId = 0);
+    public List<ProductDTO> GetProducts(int productCount, int categoryId = 0, int subCategoryId = 0,string selectedSorted=null);
     public ProductDTO ProductDetail(int productid);
     public List<CategoryDTO> GetCategories();
     public List<SubCategoryDTO> GetSubCategoriesByCategoryId(int selCategoryId);
@@ -19,9 +19,10 @@ public class ProductService : IProductService
         _productRepository = productRepository;
     }
 
-    public List<ProductDTO> GetProducts(int productCount, int categoryId = 0, int subCategoryId = 0)
+    public List<ProductDTO> GetProducts(int productCount, int categoryId = 0, int subCategoryId = 0,string selectedSorted = null)
     {
-        var result = _productRepository.GetProductsByCategoryandSubCategory(productCount, categoryId, subCategoryId);
+        var result = _productRepository.GetProductsByCategoryandSubCategory(productCount, categoryId, subCategoryId,selectedSorted);
+
         if (result.Count < 1)
         {
             result = _productRepository.GetProductsByCategoryandSubCategory(productCount, categoryId);

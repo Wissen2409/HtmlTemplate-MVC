@@ -3,6 +3,7 @@ using AutoMapper;
 using HtmlTemplate_MVC.DataAccessLayer;
 using HtmlTemplate_MVC.DMO;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 
 public interface IProductRepository
 {
@@ -10,7 +11,7 @@ public interface IProductRepository
     public ProductDTO ProductDetail(int productid);
     public List<CategoryDTO> GetAllCategories();
     public List<SubCategoryDTO> GetSubCategoriesByCategoryId(int categoryId);
-    public List<ProductDTO> GetProductsByCategoryandSubCategory(int productRequested, int? categoryId = 0, int? subCategoryId = 0);
+    public List<ProductDTO> GetProductsByCategoryandSubCategory(int productRequested, int? categoryId = 0, int? subCategoryId = 0,string? selectedSorted = null);
     public List<ProductDTO> GetProductByName(string searchString);
     public decimal GetMinPrice();
     public decimal GetMaxPrice();
@@ -96,7 +97,7 @@ public class ProductRepository : IProductRepository
     /// Istenilen miktarda urunleri listeler.
     /// Ayrica category id ve subcategory id verilerek filtreleme yaparak urunleri listeleyebilir.
     /// </summary>
-    public List<ProductDTO> GetProductsByCategoryandSubCategory(int productRequested, int? categoryId = 0, int? subCategoryId = 0) // dinamik olarak sorgu yapacak
+    public List<ProductDTO> GetProductsByCategoryandSubCategory(int productRequested, int? categoryId = 0, int? subCategoryId = 0, string? selectedSorted = null) // dinamik olarak sorgu yapacak
     {
         var query = _context.Products
         .Include(p => p.ProductProductPhotos)
@@ -114,8 +115,27 @@ public class ProductRepository : IProductRepository
             }
         }
 
+//// Sorted seçildiyse ilgili işlem burada databaseden çekilmeden yapılması gerekiyor. Ürün adeti sorun çıkarmaması için where koşulundan önce eklendi ;
+         switch (selectedSorted)
+        {
+            case "PriceAsc":
+            query = query.OrderBy(x=>x.StandardCost);
+            break;
+            case "PriceDesc":
+            query = query.OrderByDescending(x=>x.StandardCost);
+            break;
+            case "NameAsc":
+            query =  query.OrderBy(x=>x.Name);
+            break;
+            case "NameDesc":
+            query =  query.OrderByDescending(x=>x.Name);
+            break;
+            
+        }
+////////////////////
 
         query = query.Where(p => p.ListPrice > 0).Take(productRequested); // sorguya fiyati olmayan urunlerin cikarilmasi kosulu ve take medodu eklendi
+
 
         return query.Select(p => new ProductDTO
         {
