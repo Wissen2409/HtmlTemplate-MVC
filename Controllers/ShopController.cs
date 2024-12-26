@@ -15,7 +15,7 @@ public class ShopController : Controller
 
 
 
-    public IActionResult Index(int selCategoryId = 0, int selSubCategoryId = 0, string searchString = "")
+    public IActionResult Index(int selCategoryId = 0, int selSubCategoryId = 0, string searchString = "",string selectedSorted=null)
     {
         BreadCrumbViewBagHelper.SetBreadCrumb(ViewData, ("Home", "/"), ("Shop", null)); // Breadcrumb icin gerekli
 
@@ -25,6 +25,8 @@ public class ShopController : Controller
 
         model.SelCategoryId = selCategoryId;                                            // category ve subcategor secimi modele yerlestirilmeli
         model.SelSubCategoryId = selSubCategoryId;
+        TempData["SelectedCategoryID"]=model.SelCategoryId;
+        TempData["SelectedSubCategoryID"]=model.SelSubCategoryId;
 
         if (model.SelCategoryId > 0)                                 // eger kategory secimi yapilmissa, subcategories listesi modele eklenmeli
         {
@@ -47,8 +49,9 @@ public class ShopController : Controller
         else
         {
             // category ve subcategory secimi yapilmissa sorgu ona gore gelecek zaten, Ayri bir kosul belitrmeye gerek yok. Repo katmaninda sorgu her 3 duruma uygun olacak sekilde yazildi.
-            model.Products = _mapper.Map<List<ProductViewModel>>(_service.GetProducts(9, model.SelCategoryId, model.SelSubCategoryId));
+            model.Products = _mapper.Map<List<ProductViewModel>>(_service.GetProducts(9, model.SelCategoryId, model.SelSubCategoryId,selectedSorted));
         }
+
 
         return View(model);
     }
@@ -67,6 +70,15 @@ public class ShopController : Controller
     {
         // Form gönderimi için Index metoduna yönlendirme yapıyoruz
         return RedirectToAction("Index", "Shop", new { selCategoryId = selectedCategoryID });
+    }
+      public IActionResult SelectSorted(string selectedSorted)
+    {        
+        var selectedCategoryID = TempData["SelectedCategoryID"];
+        var selectedSubCategoryID = TempData["SelectedSubCategoryID"];
+        TempData["selectedSorted"] = selectedSorted;
+
+
+        return RedirectToAction("Index","Shop",new{selectedSorted = selectedSorted,selCategoryID = selectedCategoryID,selSubCategoryId=selectedSubCategoryID }); 
     }
 }
 
