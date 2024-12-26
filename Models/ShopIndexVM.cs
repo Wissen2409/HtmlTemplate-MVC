@@ -5,4 +5,8 @@ public class ShopIndexVM
     public int SelSubCategoryId { get; set; }
     public List<CategoryVM> Categories { get; set; }
     public List<SubCategoryVM> SubCategories { get; set; }
+
+     public decimal MinPrice { get; set; }
+    public decimal MaxPrice { get; set; }
+    public List<string> Colors { get; set; }
 }

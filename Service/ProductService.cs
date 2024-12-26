@@ -4,7 +4,11 @@ public interface IProductService
     public List<ProductDTO> GetProducts(int productCount, int categoryId = 0, int subCategoryId = 0);
     public ProductDTO ProductDetail(int productid);
     public List<CategoryDTO> GetCategories();
-    public ShopIndexDTO FilterCategoriesAndSubCategories(ShopIndexDTO model);
+    public List<SubCategoryDTO> GetSubCategoriesByCategoryId(int selCategoryId);
+    public List<ProductDTO> GetProductByName(string searchString);
+    public FilterDTO PopulateFilters();
+    public List<ProductDTO> GetFilteredProducts(FilterDTO filter);
+
 }
 public class ProductService : IProductService
 {
@@ -17,7 +21,12 @@ public class ProductService : IProductService
 
     public List<ProductDTO> GetProducts(int productCount, int categoryId = 0, int subCategoryId = 0)
     {
-        return _productRepository.GetProductsByCategoryandSubCategory(productCount, categoryId, subCategoryId);
+        var result = _productRepository.GetProductsByCategoryandSubCategory(productCount, categoryId, subCategoryId);
+        if (result.Count < 1)
+        {
+            result = _productRepository.GetProductsByCategoryandSubCategory(productCount, categoryId);
+        }
+        return result;
     }
 
     public ProductDTO ProductDetail(int productid)
@@ -30,16 +39,36 @@ public class ProductService : IProductService
         return _productRepository.GetAllCategories();
     }
 
-    public ShopIndexDTO FilterCategoriesAndSubCategories(ShopIndexDTO model)
+    public List<SubCategoryDTO> GetSubCategoriesByCategoryId(int selCategoryId)
     {
-        model.Categories = _productRepository.GetAllCategories();
-        model.SubCategories = _productRepository.GetSubCategoriesByCategoryId(model.SelCategoryId);
-        model.Products = _productRepository.GetProductsByCategoryandSubCategory(12, model.SelCategoryId, model.SelSubCategoryId);
-        if (model.Products.Count < 1)
+        return _productRepository.GetSubCategoriesByCategoryId(selCategoryId);
+    }
+
+    public List<ProductDTO> GetProductByName(string searchString)
+    {
+        return _productRepository.GetProductByName(searchString);
+    }
+
+    public FilterDTO PopulateFilters()
+    {
+        // Filtreleme için gerekli değerler burada doldurulur
+
+        return new FilterDTO
         {
-            model.Products = _productRepository.GetProductsByCategoryandSubCategory(12, model.SelCategoryId);
-            model.SelSubCategoryId = 0;
-        }
-        return model;
+            MinPrice = _productRepository.GetMinPrice(),
+            MaxPrice = _productRepository.GetMaxPrice(),
+            Colors = _productRepository.GetUniqueColors(),
+        };
+    }
+    public List<ProductDTO> GetFilteredProducts(FilterDTO filter)
+    {
+        return _productRepository.GetFilteredProducts(
+
+            filter.SelCategoryId,
+            filter.SelSubCategoryId,
+            filter.SelectedMinPrice,
+            filter.SelectedMaxPrice,
+            filter.SelectedColors
+        );
     }
 }
