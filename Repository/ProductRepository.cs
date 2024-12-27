@@ -11,14 +11,22 @@ public interface IProductRepository
     public ProductDTO ProductDetail(int productid);
     public List<CategoryDTO> GetAllCategories();
     public List<SubCategoryDTO> GetSubCategoriesByCategoryId(int categoryId);
-    public List<ProductDTO> GetProductsByCategoryandSubCategory(int productRequested, int? categoryId = 0, int? subCategoryId = 0, string? selectedSorted = null);
+    public List<ProductDTO> GetProductsByCategoryandSubCategory
+    (
+        int productRequested,
+        string? selectedSorted = null,
+        int? categoryId = 0,
+        int? subCategoryId = 0,
+        decimal? minPrice = 0,
+        decimal? maxPrice = 0,
+        List<string>? selectedColors = null
+    );
     public List<ProductDTO> GetProductByName(string searchString);
     public decimal GetMinPrice();
     public decimal GetMaxPrice();
     public List<string> GetUniqueColors();
-    public List<ProductDTO> GetFilteredProducts(int? categoryId, int? subCategoryId, decimal? minPrice, decimal? maxPrice, List<string> selectedColors);
-
 }
+
 public class ProductRepository : IProductRepository
 {
 
@@ -97,14 +105,23 @@ public class ProductRepository : IProductRepository
     /// Istenilen miktarda urunleri listeler.
     /// Ayrica category id ve subcategory id verilerek filtreleme yaparak urunleri listeleyebilir.
     /// </summary>
-    public List<ProductDTO> GetProductsByCategoryandSubCategory(int productRequested, int? categoryId = 0, int? subCategoryId = 0, string? selectedSorted = null) // dinamik olarak sorgu yapacak
+    public List<ProductDTO> GetProductsByCategoryandSubCategory // dinamik olarak sorgu yapacak
+    (
+        int productRequested,
+        string? selectedSorted = null,
+        int? categoryId = 0,
+        int? subCategoryId = 0,
+        decimal? minPrice = 0,
+        decimal? maxPrice = 0,
+        List<string>? selectedColors = null
+    )
     {
         var query = _context.Products
         .Include(p => p.ProductProductPhotos)
         .ThenInclude(t => t.ProductPhoto)
         .AsQueryable();
-        // tabloya eristik ancak sorguyu henuz gondermedi. Dinamik olarak sorguyu hazirlayip en son gondercem
 
+        #region kategory ve alt kategory sorgusu
         if (categoryId.HasValue && categoryId != 0)
         {
             query = query.Where(p => p.ProductSubcategory.ProductCategoryId == categoryId); // sorguya kategory id ye gore filtreleme eklendi
@@ -114,8 +131,21 @@ public class ProductRepository : IProductRepository
                 query = query.Where(p => p.ProductSubcategoryId == subCategoryId); // sorguya subcategoryid 'ye gore filtreleme eklendi.
             }
         }
+        #endregion
 
-        //// Sorted seçildiyse ilgili işlem burada databaseden çekilmeden yapılması gerekiyor. Ürün adeti sorun çıkarmaması için where koşulundan önce eklendi ;
+        #region  renk ve fiyat filtreleri sorgusu
+        if (minPrice.HasValue)
+            query = query.Where(p => p.StandardCost >= minPrice.Value);
+
+        if (maxPrice.HasValue && minPrice > 0)
+            query = query.Where(p => p.StandardCost <= maxPrice.Value);
+
+        if (selectedColors != null && selectedColors.Any())
+            query = query.Where(p => selectedColors.Contains(p.Color));
+        #endregion
+
+        #region  siralama islemi sorguya eklendi (son adim)
+        // Sorted seçildiyse ilgili işlem burada databaseden çekilmeden yapılması gerekiyor. Ürün adeti sorun çıkarmaması için where koşulundan önce eklendi ;
         switch (selectedSorted)
         {
             case "PriceAsc":
@@ -130,13 +160,10 @@ public class ProductRepository : IProductRepository
             case "NameDesc":
                 query = query.OrderByDescending(x => x.Name);
                 break;
-
         }
-        ////////////////////
+        #endregion
 
-        query = query.Where(p => p.ListPrice > 0).Take(productRequested); // sorguya fiyati olmayan urunlerin cikarilmasi kosulu ve take medodu eklendi
-
-
+        query = query.Take(productRequested);
         return query.Select(p => new ProductDTO
         {
             ProductId = p.ProductId,
@@ -145,8 +172,10 @@ public class ProductRepository : IProductRepository
             StandardCost = p.StandardCost,
             Color = p.Color,
             LargePhoto = ImgConverter.ConvertImageToBase64(p.ProductProductPhotos.FirstOrDefault().ProductPhoto.LargePhoto),
-        }).ToList(); // Sorgu db'ye gonderildi gelen yanit geri donduruldu
+        }).ToList();
     }
+
+
 
     public List<ProductDTO> GetProductByName(string searchString)
     {
@@ -165,9 +194,7 @@ public class ProductRepository : IProductRepository
         return searchcontext;
     }
 
-
     // Filter By Color ve Filter By Price alanları
-
     public decimal GetMinPrice()
     {
         return _context.Products.Min(p => p.ListPrice);
@@ -187,40 +214,4 @@ public class ProductRepository : IProductRepository
         .ToList();
     }
 
-    public List<ProductDTO> GetFilteredProducts(int? categoryId, int? subCategoryId, decimal? minPrice, decimal? maxPrice, List<string> selectedColors)
-    {
-        var query = _context.Products
-        .Include(p => p.ProductSubcategory)
-        .AsQueryable(); // query üzerinde ek filtreleme yapılabilmesini sağlar.
-
-        // Dinamik Filtreleme
-
-        if (categoryId.HasValue && categoryId > 0)
-            query = query.Where(p => p.ProductSubcategory.ProductCategoryId == categoryId);
-
-        if (subCategoryId.HasValue && subCategoryId > 0)
-            query = query.Where(p => p.ProductSubcategoryId == subCategoryId);
-
-        if (minPrice.HasValue)
-            query = query.Where(p => p.StandardCost >= minPrice.Value);
-
-        if (maxPrice.HasValue)
-            query = query.Where(p => p.StandardCost <= maxPrice.Value);
-
-        if (selectedColors != null && selectedColors.Any())
-            query = query.Where(p => selectedColors.Contains(p.Color));
-
-        query = query.Where(p => p.ListPrice > 0);
-
-        return query.Select(p => new ProductDTO
-        {
-            ProductId = p.ProductId,
-            Name = p.Name,
-            ListPrice = p.ListPrice,
-            StandardCost = p.StandardCost,
-            Color = p.Color,
-            LargePhoto = ImgConverter.ConvertImageToBase64(p.ProductProductPhotos.FirstOrDefault().ProductPhoto.LargePhoto),
-        }).ToList();
-
-    }
 }
