@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 
 public class ShopController : Controller
 {
+    private const int pageSize = 12;
     private IMapper _mapper;
     private IProductService _service;
     public ShopController(IMapper mapper, IProductService service)
@@ -13,9 +14,16 @@ public class ShopController : Controller
         _service = service;
     }
 
-
-
-    public IActionResult Index(int selCategoryId = 0, int selSubCategoryId = 0, string searchString = "", string selectedSorted = null, decimal? selectedMinPrice = null, decimal? selectedMaxPrice = null, List<string> selectedColors = null)
+    public IActionResult Index
+    (
+        int selCategoryId = 0,
+        int selSubCategoryId = 0,
+        string searchString = "",
+        string selectedSorted = null,
+        decimal? selectedMinPrice = null,
+        decimal? selectedMaxPrice = null,
+        List<string> selectedColors = null
+    )
     {
         BreadCrumbViewBagHelper.SetBreadCrumb(ViewData, ("Home", "/"), ("Shop", null)); // Breadcrumb icin gerekli
 
@@ -28,7 +36,7 @@ public class ShopController : Controller
         TempData["SelectedCategoryID"] = model.SelCategoryId;
         TempData["SelectedSubCategoryID"] = model.SelSubCategoryId;
 
-        if (model.SelCategoryId > 0)                                 // eger kategory secimi yapilmissa, subcategories listesi modele eklenmeli
+        if (model.SelCategoryId > 0)           // eger kategory secimi yapilmissa, subcategories listesi modele eklenmeli
         {
             model.SubCategories = _mapper.Map<List<SubCategoryVM>>(_service.GetSubCategoriesByCategoryId(model.SelCategoryId));
         }
@@ -37,27 +45,13 @@ public class ShopController : Controller
         model.MinPrice = filters.MinPrice;
         model.MaxPrice = filters.MaxPrice;
         model.Colors = filters.Colors;
+        model.SelectedMinPrice = selectedMinPrice;
+        model.SelectedMaxPrice = selectedMaxPrice;
+        model.SelectedColors = selectedColors;
 
-        // Eğer filtreleme yapılmissa
 
-        if (selectedMinPrice.HasValue || selectedMaxPrice.HasValue || (selectedColors != null && selectedColors.Any()))
-        {
-
-            var filterDTO = new FilterDTO
-            {
-
-                SelCategoryId = selCategoryId,
-                SelSubCategoryId = selSubCategoryId,
-                SelectedMinPrice = selectedMinPrice,
-                SelectedMaxPrice = selectedMaxPrice,
-                SelectedColors = selectedColors
-            };
-
-            var filteredProducts = _service.GetFilteredProducts(filterDTO);
-            model.Products = _mapper.Map<List<ProductViewModel>>(filteredProducts);
-        }
-        else if (!string.IsNullOrEmpty(searchString))                                        // Arama metni varsa
-        {                                                                           // product listesi arama yaparak olusturulmali
+        if (!string.IsNullOrEmpty(searchString))                      // Arama metni varsa sorgu bagimsiz calisacak
+        {                                                             // product listesi arama yaparak olusturulmali
             var dtoResult = _service.GetProductByName(searchString);
             var result = _mapper.Map<List<ProductViewModel>>(dtoResult);
 
@@ -66,8 +60,7 @@ public class ShopController : Controller
 
         else
         {
-            // category ve subcategory secimi yapilmissa sorgu ona gore gelecek zaten, Ayri bir kosul belitrmeye gerek yok. Repo katmaninda sorgu her 3 duruma uygun olacak sekilde yazildi.
-            model.Products = _mapper.Map<List<ProductViewModel>>(_service.GetProducts(9, model.SelCategoryId, model.SelSubCategoryId, selectedSorted));
+            model.Products = _mapper.Map<List<ProductViewModel>>(_service.GetProducts(pageSize, selectedSorted, model.SelCategoryId, model.SelSubCategoryId, model.SelectedMinPrice, model.SelectedMaxPrice, model.SelectedColors));
         }
 
 

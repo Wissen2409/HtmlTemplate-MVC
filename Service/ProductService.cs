@@ -1,15 +1,23 @@
 
 public interface IProductService
 {
-    public List<ProductDTO> GetProducts(int productCount, int categoryId = 0, int subCategoryId = 0,string selectedSorted=null);
+    public List<ProductDTO> GetProducts
+    (
+        int productRequested,
+        string? selectedSorted = null,
+        int? categoryId = 0,
+        int? subCategoryId = 0,
+        decimal? minPrice = 0,
+        decimal? maxPrice = 0,
+        List<string>? selectedColors = null
+    );
     public ProductDTO ProductDetail(int productid);
     public List<CategoryDTO> GetCategories();
     public List<SubCategoryDTO> GetSubCategoriesByCategoryId(int selCategoryId);
     public List<ProductDTO> GetProductByName(string searchString);
     public FilterDTO PopulateFilters();
-    public List<ProductDTO> GetFilteredProducts(FilterDTO filter);
-
 }
+
 public class ProductService : IProductService
 {
     // servis katmaninda sadece is plani uygulanacagi icin mapleme islemini burda yapmasak daha iyi olur?
@@ -19,13 +27,22 @@ public class ProductService : IProductService
         _productRepository = productRepository;
     }
 
-    public List<ProductDTO> GetProducts(int productCount, int categoryId = 0, int subCategoryId = 0,string selectedSorted = null)
+    public List<ProductDTO> GetProducts
+    (
+        int productRequested,
+        string? selectedSorted = null,
+        int? categoryId = 0,
+        int? subCategoryId = 0,
+        decimal? minPrice = 0,
+        decimal? maxPrice = 0,
+        List<string>? selectedColors = null
+    )
     {
-        var result = _productRepository.GetProductsByCategoryandSubCategory(productCount, categoryId, subCategoryId,selectedSorted);
+        var result = _productRepository.GetProductsByCategoryandSubCategory(productRequested, selectedSorted, categoryId, subCategoryId, minPrice, maxPrice, selectedColors);
 
         if (result.Count < 1)
         {
-            result = _productRepository.GetProductsByCategoryandSubCategory(productCount, categoryId);
+            result = _productRepository.GetProductsByCategoryandSubCategory(productRequested, selectedSorted, categoryId);
         }
         return result;
     }
@@ -60,16 +77,5 @@ public class ProductService : IProductService
             MaxPrice = _productRepository.GetMaxPrice(),
             Colors = _productRepository.GetUniqueColors(),
         };
-    }
-    public List<ProductDTO> GetFilteredProducts(FilterDTO filter)
-    {
-        return _productRepository.GetFilteredProducts(
-
-            filter.SelCategoryId,
-            filter.SelSubCategoryId,
-            filter.SelectedMinPrice,
-            filter.SelectedMaxPrice,
-            filter.SelectedColors
-        );
     }
 }
